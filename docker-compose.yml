@@ -1,0 +1,43 @@
+version: '3.1'
+
+networks:
+  heimdall-network:
+    driver: bridge
+
+services:
+  prometheus:
+    image: bitnami/prometheus:latest
+    # image: my-repo/prom/prometheus:latest
+    privileged: true
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - '9090:9090'
+    container_name: prometheus
+
+  blackbox:
+    image: bitnami/blackbox-exporter:latest
+    # image: my-repo/prom/blackbox-exporter:latest
+    privileged: true
+    volumes:
+      - ./blackbox.yml:/etc/blackbox_exporter/config.yml
+    ports:
+      - '9115:9115'
+    container_name: blackbox-exporte
+
+  node-exporter:
+    image: bitnami/node-exporter:latest
+    # image: my-repo/prom/node-exporter:latest
+    privileged: true
+    ports:
+      - '9100:9100'
+
+  grafana:
+    image: grafana/grafana:latest
+    # image: my-repo/bitnami/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=securepass
+    depends_on:
+      - prometheus
+    ports:
+      - "3000:3000"
